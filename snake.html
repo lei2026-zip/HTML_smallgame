@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style type="text/css">
+		button{
+			background: gainsboro;height: 60px;width: 100px;
+		}
+			table{
+				border: double 2px red ;
+			}
+			table td{
+				width: 20px;height: 20px;
+			}
+			div#buttom{
+				width: 500px;height: 300px;
+			}
+			#b1{
+				position: relative;left: 150px;
+			}
+			#b2{
+				position: relative;top: 62px;right: 40px;
+			}
+			#b3{
+				position: relative;top: 62px;left: 30px;
+			}
+			#b4{
+				position: relative;top: 124px;right: 160px;			
+			}
+		</style>
+	</head>
+	<body>
+		<input type="number" id="speed" style="height: 50px;"  placeholder="速度默认300 n>0" />
+		<input type="button" onclick="speeed()" style="height: 50px;" value="修改蛇的速度" />
+		<input onclick="inset_game()" type="button" value="重新开始" style="height: 50px; width: 100px;"></input>
+        <script type="text/javascript">
+        function speeed(){
+        	var num = document.getElementById("speed")
+        	if(num.value>100)
+        	{
+        		 	speed = num.value
+        	}
+        	else{
+        		speed = num.value
+        		alert("速度过快，请慎重")
+        	}
+        } 	
+        </script>
+		<table id="tab">
+		</table>
+		<!--===========================================================-->
+		<!--===========================================================-->
+		<!--===========================================================-->
+		<div id="buttom">
+		        <button onclick="turn_top()" id="b1">上</button>
+				<button onclick="turn_left()" id="b2">左</button>
+				<button onclick="turn_right()" id="b3">右</button>
+				<button onclick="turn_bottom()" id="b4">下</button>
+		</div>
+		<!--==========================================================-->
+		<!--==========================================================-->
+		<!--==========================================================-->
+		<script type="text/javascript">
+		    var hei,wid,len=0;
+		    var speed = 300;
+		    var s_hei,s_wid,t,sta = 2;
+		    var jd=0;
+		    var out = 2;
+		    var top1=null,left1=null,right1=null,bottom1=null;
+		    var map_hei = new Array(3);
+		    var map_wid = new Array(3);
+		    function build_table(){
+		    	var tab = document.getElementById("tab")
+		    	var k,h;
+		    	for(var i=0;i<16;i++)
+		    	{
+		    		 k = document.createElement("tr")	
+		    		for(var j=0;j<16;j++)
+		    		{
+		    			h = document.createElement("td")
+		    			k.appendChild(h)
+		    		}
+		    		tab.appendChild(k)
+		    	}
+		    }
+		   build_table()
+		   //===========================================================
+		    //名字：onkeydown()
+		    //描述: 设置按键触发事件
+		    //==========================================================
+		    var keyEvent = (function () {
+            document.onkeydown = function (e) {
+                if (e.keyCode === 38) { // up rotate
+                    turn_top()
+                } else if (e.keyCode === 40) { // down
+                    turn_bottom()
+                } else if (e.keyCode === 37) { // left
+                    turn_left()
+                } else if (e.keyCode === 39) { // right
+                    turn_right()
+                } else if (e.keyCode === 32) { //  space  下坠
+                    turn_bottom()
+                }
+            }
+        })();
+		//构建数组===============================================
+		   var table_map = new Array();  //先声明一维
+			for(var k=0;k<16;k++){    //一维长度为i,i为变量，可以根据实际情况改变
+				 
+				table_map[k]=new Array();  //声明二维，每一个一维数组里面的一个元素都是一个数组；
+				 
+				for(var j=0;j<16;j++){   //一维数组里面每个元素数组可以包含的数量p，p也是一个变量；
+				 
+				    table_map[k][j]= 0;    //这里将变量初始化，我这边统一初始化为空，后面在用所需的值覆盖里面的值
+				 }
+			}
+		   var game_table = new Array();  //先声明一维
+			for( k=0;k<16;k++){    //一维长度为i,i为变量，可以根据实际情况改变
+				 
+				game_table[k]=new Array();  //声明二维，每一个一维数组里面的一个元素都是一个数组；
+				 
+				for( j=0;j<16;j++){   //一维数组里面每个元素数组可以包含的数量p，p也是一个变量；
+				 
+				    game_table[k][j]= 0;    //这里将变量初始化，我这边统一初始化为空，后面在用所需的值覆盖里面的值
+				 }
+			}
+	       var index_element = document.getElementsByTagName("td")
+			for(var i=0;i<16;i++)
+			{
+				for(var j=0;j<16;j++)
+				{
+					game_table[i][j]= index_element[(i*16)+j];
+				}
+			}
+			//===========================================================
+		    //名字：random_ege()
+		    //描述：游戏中随机生成“蛋”
+		    //==========================================================
+		    function random_ege(){
+		    	do{
+		    	     hei = parseInt(Math.random()*16)
+		             wid = parseInt(Math.random()*16)
+		    	}while(table_map[hei][wid]==1)
+		        game_table[hei][wid].style.background = "khaki"
+		    }
+		    //===========================================================
+		    //名字：start_game()
+		    //描述：用于启动游戏
+		    //======================================================
+		    function start_game(){
+		    	inset_game()
+	//          turn_top()
+		    }
+		    //===========================================================
+		    //名字：inset_game()
+		    //描述：重置游戏
+		    //======================================================
+		    function inset_game(){
+		    	for( i=0;i<16;i++)
+			{
+				for( j=0;j<16;j++)
+				{
+					game_table[i][j].style.background = "red"
+				}
+			}
+			    len=0;
+		        sta = 2;
+		        jd=0;
+		        top1=null
+		        left1=null
+		        right1=null
+		        bottom1=null;
+		        for(var i=3;i<map_hei.length;i++)
+		        {
+		        	map_hei.pop();
+		        	map_wid.pop();
+		        }
+		        for(var j=0;j<16;j++)
+		        {
+		        	for(var i=0;i<16;i++)
+		        	  table_map[i][j] = 0;
+		        }
+		        snake_ahead();
+		    	random_ege(); 
+		    }
+		    //===========================================================
+		    //名字：show_new_head()
+		    //描述：显示每时每刻的蛇头
+		    //======================================================
+		    function show_new_head()
+		    {
+    	    	game_table[s_hei][s_wid].style.background = "blue";
+    	    	map_hei.push(s_hei);
+    	    	map_wid.push(s_wid);
+    			table_map[s_hei][s_wid] = 1;
+		    }
+		    function show_init_head()
+		    {
+    	    	len++;
+    			table_map[s_hei][s_wid] = 1;
+    		 	game_table[s_hei][s_wid].style.background = "blue";
+    			map_hei[len] = s_hei;
+    			map_wid[len] = s_wid;
+    			if((s_hei==hei)&&(s_wid==wid))
+			    	{
+			    		sta++;
+			    		random_ege();
+			       }
+		    }
+		    
+		     //===========================================================
+		    //名字：snake_ahead()
+		    //描述：显示初始蛇头
+		    //======================================================
+		    function snake_ahead(){
+		    	s_hei =11 ;
+		    	s_wid =11 ;
+		    	map_hei[len] = s_hei;
+		    	map_wid[len] = s_wid;
+		    	table_map[map_hei[len]][map_wid[len]] = 1;
+		    	game_table[s_hei][s_wid].style.background = "blue";
+		    }
+		    //===========================================================
+		    //名字：judge_crash()
+		    //描述：判断是否撞墙或撞自己
+		    //======================================================
+		    function clear_all(){
+		    	clearInterval(top1)
+	    		clearInterval(left1)
+	    		clearInterval(right1)
+	    		clearInterval(bottom1)
+		    }
+		    function judge_crash(){
+		    	if((s_hei>=16)||(s_hei<0))
+		    	{
+		    		clear_all()
+		    		alert('GAME OVER')
+		    		return 1;
+		    	}
+		    	else if((s_wid>=16)||(s_wid<0))
+		    	{
+		    		clear_all()
+		    		alert('GAME OVER')
+		    		return 1;
+		    	}
+		    	else{
+		    		if(table_map[s_hei][s_wid]==1)
+				    	{
+				    		clear_all()
+				    		alert('GAME OVER')
+				    		return 1;
+				    	}
+		    	}
+		    	return 0;
+		  	}
+		    //===========================================================
+		    //名字：eat_ege()
+		    //描述:  贪吃蛇吃蛋同时增长
+		    //======================================================
+		    function eat_ege(){
+		    	if((s_hei==hei)&&(s_wid==wid))
+		    	{
+		    		random_ege();
+		    	}
+		    }
+		      //===========================================================
+		    //名字：uneat_ege()
+		    //描述:  判断贪吃蛇没吃蛋
+		    //======================================================
+		    function uneat_ege()
+		    {
+		    	if((s_hei!=hei)||(s_wid!=wid))
+		    	{
+		    		game_table[map_hei[0]][map_wid[0]].style.background = "red";
+		    		table_map[map_hei[0]][map_wid[0]] = 0;
+		    		map_hei.shift();
+		    		map_wid.shift();
+		    	}
+		    }
+		    //===========================================================
+		    //名字：turn_top()
+		    //描述:  贪吃蛇转向上
+		    //======================================================
+		    function turn_top(){
+		    	if(bottom1!=null)
+		    	{
+		    		return;
+		    	}
+		    	if(jd)
+		    	{
+		    		return;
+		    	}
+
+		    	if(top1==null)
+		    	{
+		    		jd = 1;
+		    	clearInterval(left1)
+		    	left1 = null;
+		    	clearInterval(right1) 
+		    	right1 = null;
+		    	top1 = setInterval(function top(){
+		    		if(len<sta)
+		    		{
+		    			s_hei--;
+		    			show_init_head()
+		    		}
+		    	    else{
+		    	    	s_hei--;
+                        uneat_ege()
+		    	    	if(judge_crash())   //判断碰撞==================
+		    	    	{
+		    	    		return;
+		    	    	}
+		    	    	show_new_head()
+		    	    	eat_ege()
+		    	    }
+		    	    jd =0;
+		    	},speed);
+		    	}
+		    }
+            //===========================================================
+		    //名字：turn_left()
+		    //描述: 贪吃蛇转向左
+		    //==========================================================
+		     function turn_left(){
+		     	if(right1!=null)
+		    	{
+		    		return;
+		    	}	   
+		    	if(jd)
+		    	{
+		    		return;
+		    	}
+		    	if(left1==null)
+		    	{
+		    	jd = 1;
+		        clearInterval(top1)
+		    	top1 = null;
+		    	clearInterval(bottom1)
+		    	bottom1 = null;
+		    	left1 = setInterval(function top(){
+		    		if(len<sta)
+		    		{
+		    			s_wid--;
+		    			show_init_head()
+		    		}
+		    	    else{
+		    	    	s_wid--;
+		    	    	uneat_ege()
+		    	    	if(judge_crash())   //判断碰撞==================
+		    	    	{
+		    	    		return;
+		    	    	}		    	    	
+		    	    	show_new_head()
+		    	    	eat_ege()
+		    	    }
+		    	    jd =0;
+		    	},speed);
+		        }
+		    }
+           //===========================================================
+		    //名字：turn_right()
+		    //描述:  贪吃蛇转向右
+		    //======================================================
+		     function turn_right(){
+		     	if(left1!=null)
+		    	{
+		    		return;
+		    	}	  
+		    	if(jd)
+		    	{
+		    		return;
+		    	}
+
+    	    	if(right1==null)
+		    	{
+		    		jd = 1;
+		    	clearInterval(top1)
+		    	top1 = null;
+		    	clearInterval(bottom1)
+		    	bottom1 = null;
+		    	right1 = setInterval(function top(){
+		    		if(len<sta)
+		    		{
+		    			s_wid++;
+		    			show_init_head()
+		    		}
+		    	    else{
+		    	    	s_wid++;
+                        uneat_ege()
+		    	    	if(judge_crash())   //判断碰撞==================
+		    	    	{
+		    	    		return;
+		    	    	}		    	    	
+		    	    	show_new_head()
+		    	    	eat_ege()
+		    	    }
+		    	    jd =0;
+		    	},speed);
+		    	}
+
+		    }
+            //===========================================================
+		    //名字：turn_bottom()
+		    //描述: 贪吃蛇转向下
+		    //======================================================
+		     function turn_bottom(){
+		     	if(top1!=null)
+		    	{
+		    		return;
+		    	}	    	
+		    	if(jd)
+		    	{
+		    		return;
+		    	}
+		    	if(bottom1==null)
+		    	{
+		    		jd = 1;
+		    	clearInterval(left1);
+		    	left1 = null;
+		    	clearInterval(right1);
+		    	right1 = null;
+			    	bottom1 = setInterval(function bottom(){
+			    		if(len<sta)
+			    		{
+			    			s_hei++;
+			    			show_init_head()
+			    		}
+			    	    else{
+			    	    	s_hei++;
+                            uneat_ege()
+			    	    	if(judge_crash())   //判断碰撞==================
+			    	    	{
+			    	    		return;
+			    	    	}
+			    	    	show_new_head()
+			    	    	eat_ege();
+			    	    }
+			    	    jd =0;
+			    	},speed);
+		       }
+		    }
+		    start_game()
+             //====================================================================================
+             //名字；smart_snake()
+             //描述：自动寻路前进eat ege
+             //====================================================================================
+             function smart_snake()
+             {
+             	
+             }
+		</script>
+	</body>
+</html>
+

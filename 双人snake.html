@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>小晖的双人贪吃蛇</title>
+		<link rel="stylesheet" href="" type="text/css"/>
+		<style type="text/css">
+	    
+		button{
+			background: gainsboro;
+		}
+			table{
+				border: double 2px greenyellow ;
+				border: solid 5px gray;
+				background: red;
+				border-collapse: collapse;
+			}
+			table td{
+				width: 15px;
+				height: 15px;
+			}
+			#buttom{
+				width: 500px;
+				height: 300px;
+			}
+			#b1{
+				position: relative;
+				left: 150px;
+				height: 60px;
+				width: 100px;
+			}
+			#b2{
+				position: relative;
+				top: 62px;
+				right: 40px;
+				height: 60px;
+				width: 100px;
+			}
+			#b3{
+				position: relative;
+				top: 62px;
+				left: 30px;
+				height: 60px;
+				width: 100px;
+			}
+			#b4{
+				position: relative;
+				top: 124px;
+				right: 160px;
+				height: 60px;
+				width: 100px;
+			}
+			#div2{
+			    position: fixed;
+			    top: 0px;
+			    left: 480px;
+			}
+			#div3{
+				position: fixed;
+				top: 0px;
+				left: 780px;
+			}
+			.div2{
+				 text-align: center; 
+			    color: aliceblue;
+			    font-weight: 900;
+			    height: 40px; 
+			    width: 300px; 
+			    background: red; 
+			    border: dashed blue 3px; 
+			    line-height: 40px; 
+			    font-size: 16px;
+			}
+		</style>
+	</head>
+	<body id="body1">
+		<script>
+			var joy = document.getElementById("body1")
+			var emotion = new Array("(✿◠‿◠)","(͡° ͜ʖ ͡°)"," ≥Ö‿Ö≤ ","(ô‿ô)","≧◠◡◠≦ ","(>‿◠)","☜(ˆ▽ˆ)",
+			"（‐＾▽＾‐）","ᕙ( ＾‿ゝ＾ c)","≧◔◡◔≦ ","≧◉◡◉≦","(¬‿¬)","(─‿‿─)","٩(●̮̃•)۶","\﻿(•◡•)/")
+			joy.onclick = function client_smotiong(evt){
+				var e = evt || window.event
+				//var times = 10;
+				var x = e.clientX-30
+				var y = e.clientY +5
+				var op = 1;
+				var a = parseInt(Math.random()*255)
+				var b = parseInt(Math.random()*255)
+				var c = parseInt(Math.random()*255)
+				var fon = document.createElement("font")
+				var rand = parseInt(Math.random()*15)
+				rand = document.createTextNode(emotion[rand])
+				fon.appendChild(rand)	
+				fon.style.position = "fixed"
+				fon.style.left = x+"px"
+				fon.style.top = y+"px";
+				fon.style.color = "rgba("+a+","+b+","+c+","+1+")"
+				fon.style.fontWeight = 900;
+				joy.appendChild(fon)
+				var i=0;
+				setInterval(function s(){
+						fon.style.top = y+1*i+"px"
+						i++;
+						if(i%10==0)
+							{
+								op = op-0.1
+								fon.style.color = "rgba("+a+","+b+","+c+","+op+")"
+							}	
+						if(i==100)
+						{			
+							joy.removeChild(fon)
+							clearInterval(this)
+						}		
+						
+					},15)
+			}
+		</script>
+        <!--
+        	作者：雷
+        	时间：2019-12-03  到  2019-12-06
+        	描述：双人贪吃蛇 
+        -->
+		<input type="number" id="speed" style="height: 40px;"  placeholder="默认100越小越快 n>0" />
+		<input type="button" onclick="speeed()" style="height: 40px;" value="修改蛇的速度" />
+		<input type="button" onclick="inset_all_snake()" style="height: 40px; width: 100px;" value="重新开始" />
+		<input type="button" onclick="open_smart_snake()" style="height: 40px; width: 100px;" value="开/关人机" />
+		<div id="div2" class="div2"></div>
+		<div id="div3" class="div2"></div>
+        <script type="text/javascript">
+        function open_smart_snake(){
+        	if(smart==null)
+        	{
+        		smart_snake()      		
+        	}
+        	else{
+        		clearInterval(smart)
+        		smart =null;
+        	}
+        }
+        function history_len()
+        {
+             var display_len = document.getElementById("div2")
+             display_len.innerHTML = "红队lenth="+map_hei2.length+" / "+"蓝队lenth="+map_hei.length;
+        }
+        function history_better(){
+             var display_lenth = document.getElementById("div3")
+                better = localStorage.getItem("lenth_max")
+             	//localStorage.setItem("lenth_max",better)
+             	team = localStorage.getItem("team1")
+             	var spee = speed
+             	if(speed == 0)
+             	{
+             		spee = "max"
+             	}
+             	if(team==null)
+             	{
+             	   display_lenth.innerHTML = "最高记录: 暂无 ;"+"速度:"+spee;
+             	}
+             	else{
+             		display_lenth.innerHTML = "最高记录:"+team+better+";"+"速度:"+spee;
+             	}
+        	if(map_hei2.length>better)
+             {
+             	better = map_hei2.length;
+             	localStorage.setItem("lenth_max",better)
+                localStorage.setItem("team1","红队")
+                team = localStorage.getItem("team1")
+             	display_lenth.innerHTML = "最高记录:"+team+better+";"+" 速度:"+spee;
+             }
+             if(map_hei.length>better)
+             {
+             	better = map_hei.length;
+             	localStorage.setItem("lenth_max",better)
+             	localStorage.setItem("team1","蓝队")
+             	team = localStorage.getItem("team1")
+             	display_lenth.innerHTML = "最高记录:"+team+better+";"+"速度:"+spee;
+             }
+        }
+        function speeed(){
+        	var num = document.getElementById("speed")
+            speed = num.value;
+            if(smart!=null)
+            {
+            	  clearInterval(smart)
+            	  smart_snake()
+            }
+        	history_better()
+        } 	
+        //重置游戏==============================================================
+        function inset_all_snake(){
+        	clear_all2()
+        	clear_all()
+        	inset_snake()
+        	inset_snake2()
+            if(smart!=null)
+            {
+            	clearInterval(smart)
+            	smart = null
+            }
+             history_better()
+        	game_table[hei3][wid3].style.background = "greenyellow"
+		    game_table[hei2][wid2].style.background = "greenyellow"
+		    game_table[hei][wid].style.background = "greenyellow"
+		     hei = parseInt(Math.random()*40)
+		     wid = parseInt(Math.random()*64)
+		     hei2 = parseInt(Math.random()*40)
+		     wid2 = parseInt(Math.random()*64)
+		     hei3 = parseInt(Math.random()*40)
+		     wid3 = parseInt(Math.random()*64)
+		     game_table[hei3][wid3].style.background = "khaki"
+		     game_table[hei2][wid2].style.background = "khaki"
+		     game_table[hei][wid].style.background = "khaki"
+        }
+//      onkeydown = function
+        </script>
+		<table id="tab">
+		</table>
+		<!--===========================================================-->
+		<!--===========================================================-->
+		<!--===========================================================-->
+		<!--<div id="buttom">
+		        <button onclick="turn_top()" id="b1">上</button>
+				<button onclick="turn_left()" id="b2">左</button>
+				<button onclick="turn_right()" id="b3">右</button>
+				<button onclick="turn_bottom()" id="b4">下</button>
+		</div>
+		<div id="buttom">
+		        <button onclick="turn_top2()" id="b1">上</button>
+				<button onclick="turn_left2()" id="b2">左</button>
+				<button onclick="turn_right2()" id="b3">右</button>
+				<button onclick="turn_bottom2()" id="b4">下</button>
+		</div>-->
+		<!--==========================================================-->
+		<!--==========================================================-->
+		<!--==========================================================-->
+		<script type="text/javascript">
+		    var hei=50,wid,len=0;
+		    var hei2=50,wid2,len2=0;
+		    var hei3=50,wid3;
+		    var smart,smart2=0;
+		    var speed = 100;
+		    var s_hei2,s_wid2,sta2 = 2;
+		    var s_hei,s_wid,t,sta = 2;
+		    var jd=0;
+		    var jd2=0;
+		    var top1=null,left1=null,right1=null,bottom1=null;
+		    var top2=null,left2=null,right2=null,bottom2=null;
+		    var map_hei = new Array(3);
+		    var map_wid = new Array(3);
+		    var map_hei2 = new Array(3);
+		    var map_wid2 = new Array(3);
+		    var better ;
+		    var team = 1;
+		    team = localStorage.getItem("team1")
+		    better = localStorage.getItem("lenth_max")
+		    if(better==null)
+		    {
+		    	localStorage.setItem("lenth_max",3)
+		    }
+		    if(team==null)
+		    {
+		    	localStorage.setItem("team1",null)
+		    }
+		    better = 3;
+		    function build_table(){
+		    	var tab = document.getElementById("tab")
+		    	var k,h;
+		    	for(var i=0;i<40;i++)
+		    	{
+		    		 k = document.createElement("tr")	
+		    		for(var j=0;j<64;j++)
+		    		{
+		    			h = document.createElement("td")
+		    			k.appendChild(h)
+		    		}
+		    		tab.appendChild(k)
+		    	}
+		    }
+		   build_table()
+		   //=========================================================
+		   //==========================================================
+		    var keyEvent = (function () {
+            document.onkeydown = function (e) {
+                if (e.keyCode === 38) { // up rotate
+                    turn_top()
+                } else if (e.keyCode === 40) { // down
+                    turn_bottom()
+                } else if (e.keyCode === 37) { // left
+                    turn_left()
+                } else if (e.keyCode === 39) { // right
+                    turn_right()
+                } else if (e.keyCode === 32) { //  space  下坠
+                    turn_bottom()
+                }
+                if (e.keyCode === 87) { // up rotate
+                    turn_top2()
+                } else if (e.keyCode === 83 ) { // down
+                    turn_bottom2()
+                } else if (e.keyCode === 65) { // left
+                    turn_left2()
+                } else if (e.keyCode === 68) { // right
+                    turn_right2()
+                } else if (e.keyCode === 32) { //  space  下坠
+                    turn_bottom2()
+                }
+              }
+             })();
+		   //=========================================================
+		   //==========================================================
+		   
+		//构建数组===============================================
+		   var table_map = new Array();  //先声明一维
+			for(var k=0;k<40;k++){    //一维长度为i,i为变量，可以根据实际情况改变
+				 
+				table_map[k]=new Array();  //声明二维，每一个一维数组里面的一个元素都是一个数组；
+				 
+				for(var j=0;j<64;j++){   //一维数组里面每个元素数组可以包含的数量p，p也是一个变量；
+				 
+				    table_map[k][j]= 0;    //这里将变量初始化，我这边统一初始化为空，后面在用所需的值覆盖里面的值
+				 }
+			}
+		   var game_table = new Array();  //先声明一维
+			for( k=0;k<40;k++){    //一维长度为i,i为变量，可以根据实际情况改变
+				 
+				game_table[k]=new Array();  //声明二维，每一个一维数组里面的一个元素都是一个数组；
+				 
+				for( j=0;j<64;j++){   //一维数组里面每个元素数组可以包含的数量p，p也是一个变量；
+				 
+				    game_table[k][j]= 0;    //这里将变量初始化，我这边统一初始化为空，后面在用所需的值覆盖里面的值
+				 }
+			}
+	        var index_element = document.getElementsByTagName("td")
+			for(var i=0;i<40;i++)
+			{
+				for(var j=0;j<64;j++)
+				{
+					game_table[i][j]= index_element[(i*64)+j];
+				}
+			}
+			for( i=0;i<40;i++)
+			{
+				for( j=0;j<64;j++)
+				{
+					game_table[i][j].style.background = "greenyellow"
+				}
+			}
+			//===========================================================
+		    //名字：random_ege()
+		    //描述：游戏中随机生成“蛋”
+		    //======================================================
+		    function random_ege(){
+		    	history_len()
+		    	history_better()
+		    	if(hei == 50)
+		    	{
+		    		do{
+		    	     hei = parseInt(Math.random()*40)
+		             wid = parseInt(Math.random()*64)
+		    	}while(table_map[hei][wid]==1)
+		        game_table[hei][wid].style.background = "khaki"
+		    	}
+		    	else if(hei2 == 50)
+		    	{
+		    		do{
+		    	     hei2 = parseInt(Math.random()*40)
+		             wid2 = parseInt(Math.random()*64)
+		    	}while(table_map[hei2][wid2]==1)
+		        game_table[hei2][wid2].style.background = "khaki"
+		    	}
+		    	else if(hei3 == 50)
+		    	{
+		    		do{
+		    	     hei3 = parseInt(Math.random()*40)
+		             wid3 = parseInt(Math.random()*64)
+		    	}while(table_map[hei3][wid3]==1)
+		        game_table[hei3][wid3].style.background = "khaki"
+		    	}
+		    }
+		    //===========================================================
+		    //名字：show_new_head()
+		    //描述：显示每时每刻的蛇头
+		    //======================================================
+		    function show_new_head()
+		    {
+    	    	game_table[s_hei][s_wid].style.background = "blue";
+    	    	map_hei.push(s_hei);
+    	    	map_wid.push(s_wid);
+    			table_map[s_hei][s_wid] = 1;
+		    }
+		    function show_init_head()
+		    {
+    	    	len++;
+    			table_map[s_hei][s_wid] = 1;
+    		 	game_table[s_hei][s_wid].style.background = "blue";
+    			map_hei[len] = s_hei;
+    			map_wid[len] = s_wid;
+    			if(((s_hei==hei)&&(s_wid==wid))||((s_hei==hei2)&&(s_wid==wid2))||((s_hei==hei3)&&(s_wid==wid3)))
+			    	{
+			    		sta++;
+			    		random_ege();
+			       }
+		    }
+		    function show_new_head2()
+		    {
+    	    	game_table[s_hei2][s_wid2].style.background = "red";
+    	    	map_hei2.push(s_hei2);
+    	    	map_wid2.push(s_wid2);
+    			table_map[s_hei2][s_wid2] = 1;
+		    }
+		    function show_init_head2()
+		    {
+    	    	len2++;
+    			table_map[s_hei2][s_wid2] = 1;
+    		 	game_table[s_hei2][s_wid2].style.background = "red";
+    			map_hei2[len2] = s_hei2;
+    			map_wid2[len2] = s_wid2;
+    			if(((s_hei2==hei)&&(s_wid2==wid))||((s_hei2==hei2)&&(s_wid2==wid2))||((s_hei2==hei3)&&(s_wid2==wid3)))
+			    	{
+			    		sta2++;
+			    		random_ege();
+			       }
+		    }
+		    //===========================================================
+		    //名字：start_game()
+		    //描述：用于启动游戏
+		    //======================================================
+		    function start_game(){
+		    	 snake_ahead();
+		    	 snake_ahead2();
+		         hei = parseInt(Math.random()*40)
+		         wid = parseInt(Math.random()*64)
+		         hei2 = parseInt(Math.random()*40)
+		         wid2 = parseInt(Math.random()*64)
+		         hei3 = parseInt(Math.random()*40)
+		         wid3 = parseInt(Math.random()*64)
+		         game_table[hei3][wid3].style.background = "khaki"
+		         game_table[hei2][wid2].style.background = "khaki"
+		         game_table[hei][wid].style.background = "khaki"
+		         history_len()
+ 		         history_better()
+	//          turn_top()
+		    }
+		     //===========================================================
+		    //名字：snake_ahead()
+		    //描述：显示初始蛇头
+		    //======================================================
+		    function snake_ahead(){
+		    	s_hei =34 ;
+		    	s_wid =54 ;
+		    	map_hei[len] = s_hei;
+		    	map_wid[len] = s_wid;
+		    	table_map[map_hei[len]][map_wid[len]] = 1;
+		    	game_table[s_hei][s_wid].style.background = "blue";
+		    }
+		    function snake_ahead2(){
+		    	s_hei2 =6 ;
+		    	s_wid2 =10 ;
+		    	map_hei2[len2] = s_hei2;
+		    	map_wid2[len2] = s_wid2;
+		    	table_map[map_hei2[len2]][map_wid2[len2]] = 1;
+		    	game_table[s_hei2][s_wid2].style.background = "red";
+		    }
+		      //===========================================================
+		    //名字：judge_crash()
+		    //描述：判断是否撞墙或撞自己
+		    //======================================================
+		    function clear_all(){
+		    	clearInterval(top1)
+	    		clearInterval(left1)
+	    		clearInterval(right1)
+	    		clearInterval(bottom1)
+		    }
+		    function clear_all2(){
+		    	clearInterval(top2)
+	    		clearInterval(left2)
+	    		clearInterval(right2)
+	    		clearInterval(bottom2)
+		    }
+		    function judge_crash(){
+		    	if((s_hei>=40)||(s_hei<0))
+		    	{
+		    		clear_all()
+		    		inset_snake()
+		    		history_len()
+		    		return 1;
+		    	}
+		    	else if((s_wid>=64)||(s_wid<0))
+		    	{
+		    		clear_all()
+		    		inset_snake()
+		    		history_len()
+		    		return 1;
+		    	}
+		    	else{
+		    		if(table_map[s_hei][s_wid]==1)
+				    	{
+				    		clear_all()
+				    		inset_snake()
+				    		history_len()
+				    		return 1;
+				    	}
+		    	}
+		    	return 0;
+		  	}
+		    function judge_crash2(){
+		    	if((s_hei2>=40)||(s_hei2<0))
+		    	{
+		    		clear_all2()
+		    		inset_snake2()
+		    		history_len()
+		    		return 1;
+		    	}
+		    	else if((s_wid2>=64)||(s_wid2<0))
+		    	{
+		    		clear_all2()
+		    		inset_snake2()
+		    		history_len()
+		    		return 1;
+		    	}
+		    	else{
+		    		if(table_map[s_hei2][s_wid2]==1)
+				    	{
+				    		clear_all2()
+				    		inset_snake2()
+				    		history_len()
+				    		return 1;
+				    	}
+		    	}
+		    	return 0;
+		  	} //===========================================================
+		    //名字：inset_game()
+		    //描述：重置游戏
+		    //======================================================
+		    function inset_snake(){
+				for(var j=0;j<map_hei.length;j++)
+				{
+					if(map_hei[j]!=null)
+					{
+						game_table[map_hei[j]][map_wid[j]].style.background = "greenyellow";
+					    table_map[map_hei[j]][map_wid[j]] = 0;
+					}
+				}
+			    len=0;
+		        sta = 2;
+		        jd=0;
+		        bottom1 = null;
+		        top1 = null;
+		        left1 = null;
+		        right1 = null;
+		        var LEN = map_hei.length;
+		        for(var i=3;i<LEN;i++)
+		        {
+		        	map_hei.pop();
+		        	map_wid.pop();
+		        }
+		        snake_ahead();
+		    }
+		    function inset_snake2(){
+				for(var j=0;j<map_hei2.length;j++)
+				{
+					if(map_hei2[j]!=null)
+					{
+					   game_table[map_hei2[j]][map_wid2[j]].style.background = "greenyellow";
+					   table_map[map_hei2[j]][map_wid2[j]] = 0;
+					}
+				}
+			    len2=0;
+		        sta2 = 2;
+		        jd2=0;
+		        bottom2 = null;
+		        top2 = null;
+		        left2 = null;
+		        right2 = null;
+		        var LEN = map_hei2.length;
+		        for(var i=3;i<LEN;i++)
+		        {
+		        	map_hei2.pop();
+		        	map_wid2.pop();
+		        }
+		        snake_ahead2();
+		    }
+		     //===========================================================
+		    //名字：eat_ege()
+		    //描述:  贪吃蛇吃蛋同时增长
+		    //======================================================
+		    function eat_ege(){
+		    	if((s_hei==hei)&&(s_wid==wid))
+		    	{
+		    	    hei = 50;
+		    		random_ege();
+		    	}
+		    	else if((s_hei==hei2)&&(s_wid==wid2))
+		    	{
+		    	    hei2 = 50;
+		    		random_ege();
+		    	}
+		    	else if((s_hei==hei3)&&(s_wid==wid3))
+		    	{
+		    	    hei3 = 50
+		    		random_ege();
+		    	}	
+		    }
+		    function eat_ege2(){
+		    	if((s_hei2==hei)&&(s_wid2==wid))
+		    	{
+		    	    hei = 50;
+		    		random_ege();
+		    	}
+		    	else if((s_hei2==hei2)&&(s_wid2==wid2))
+		    	{
+		    	    hei2 = 50;
+		    		random_ege();
+		    	}
+		    	else if((s_hei2==hei3)&&(s_wid2==wid3))
+		    	{
+		    	    hei3 = 50;
+		    		random_ege();
+		    	}
+		 
+		    }
+		      //===========================================================
+		    //名字：uneat_ege()
+		    //描述:  判断贪吃蛇没吃蛋
+		    //======================================================
+		    function uneat_ege()
+		    {
+		    	if(((s_hei!=hei)||(s_wid!=wid))&&((s_hei!=hei2)||(s_wid!=wid2))&&((s_hei!=hei3)||(s_wid!=wid3)))
+		    	{
+		    		game_table[map_hei[0]][map_wid[0]].style.background = "greenyellow";
+		    		table_map[map_hei[0]][map_wid[0]] = 0;
+		    		map_hei.shift();
+		    		map_wid.shift();
+		    	}
+		    }
+		    function uneat_ege2()
+		    {
+		    	if(((s_hei2!=hei)||(s_wid2!=wid))&&((s_hei2!=hei2)||(s_wid2!=wid2))&&((s_hei2!=hei3)||(s_wid2!=wid3)))
+		    	{
+		    		game_table[map_hei2[0]][map_wid2[0]].style.background = "greenyellow";
+		    		table_map[map_hei2[0]][map_wid2[0]] = 0;
+		    		map_hei2.shift();
+		    		map_wid2.shift();
+		    	}
+		    }
+		    //===========================================================
+		    //名字：turn_top()
+		    //描述:  贪吃蛇转向上
+		    //======================================================
+		    function turn_top(){
+		    	if(bottom1!=null)
+		    	{
+		    		return;
+		    	}
+		    	if(jd)
+		    	{
+		    		return;
+		    	}
+
+		    	if(top1==null)
+		    	{
+		    		jd = 1;
+		    	clearInterval(left1)
+		    	left1 = null;
+		    	clearInterval(right1) 
+		    	right1 = null;
+		    	top1 = setInterval(function top(){
+		    		if(len<sta)
+		    		{
+		    			s_hei--;
+		    			show_init_head();
+		    		}
+		    	    else{
+		    	    	s_hei--;
+                        uneat_ege()
+		    	    	if(judge_crash())   //判断碰撞==================
+		    	    	{
+		    	    		return;
+		    	    	}
+		    	    	show_new_head()
+		    	    	eat_ege()
+		    	    }
+		    	    jd =0;
+		    	},speed);
+		    	}
+		    }
+            //===========================================================
+		    //名字：turn_left()
+		    //描述: 贪吃蛇转向左
+		    //==========================================================
+		     function turn_left(){
+		     	if(right1!=null)
+		    	{
+		    		return;
+		    	}	   
+		    	if(jd)
+		    	{
+		    		return;
+		    	}
+		    	if(left1==null)
+		    	{
+		    	jd = 1;
+		        clearInterval(top1)
+		    	top1 = null;
+		    	clearInterval(bottom1)
+		    	bottom1 = null;
+		    	left1 = setInterval(function top(){
+		    		if(len<sta)
+		    		{
+		    			s_wid--;
+		    			show_init_head()
+		    		}
+		    	    else{
+		    	    	s_wid--;
+		    	    	uneat_ege()
+		    	    	if(judge_crash())   //判断碰撞==================
+		    	    	{
+		    	    		return;
+		    	    	}
+		    	    	show_new_head()
+		    	    	eat_ege();
+		    	    }
+		    	    jd =0;
+		    	},speed);
+		        }
+		    }
+           //===========================================================
+		    //名字：turn_right()
+		    //描述:  贪吃蛇转向右
+		    //======================================================
+		     function turn_right(){
+		     	if(left1!=null)
+		    	{
+		    		return;
+		    	}	  
+		    	if(jd)
+		    	{
+		    		return;
+		    	}
+
+    	    	if(right1==null)
+		    	{
+		    		jd = 1;
+		    	clearInterval(top1)
+		    	top1 = null;
+		    	clearInterval(bottom1)
+		    	bottom1 = null;
+		    	right1 = setInterval(function top(){
+		    		if(len<sta)
+		    		{
+		    			s_wid++;
+		    			show_init_head()
+		    		}
+		    	    else{
+		    	    	s_wid++;
+                        uneat_ege()
+		    	    	if(judge_crash())   //判断碰撞==================
+		    	    	{
+		    	    		return;
+		    	    	}
+		    	    	show_new_head()
+		    	    	eat_ege();
+		    	    }
+		    	    jd =0;
+		    	},speed);
+		    	}
+
+		    }
+            //===========================================================
+		    //名字：turn_bottom()
+		    //描述: 贪吃蛇转向下
+		    //======================================================
+		     function turn_bottom(){
+		     	if(top1!=null)
+		    	{
+		    		return;
+		    	}	    	
+		    	if(jd)
+		    	{
+		    		return;
+		    	}
+		    	if(bottom1==null)
+		    	{
+		    		jd = 1;
+		    	clearInterval(left1);
+		    	left1 = null;
+		    	clearInterval(right1);
+		    	right1 = null;
+			    	bottom1 = setInterval(function bottom(){
+			    		if(len<sta)
+			    		{
+			    			s_hei++;
+			    			show_init_head()
+			    		}
+			    	    else{
+			    	    	s_hei++;
+                            uneat_ege()
+			    	    	if(judge_crash())   //判断碰撞==================
+			    	    	{
+			    	    		return;
+			    	    	}
+			    	    	show_new_head()
+			    	    	eat_ege();
+			    	    }
+			    	    jd =0;
+			    	},speed);
+		       }
+		    }
+		    //=========================================================================
+		    //========================================================================
+		    //=========================================================================
+		    		    //===========================================================
+		    //名字：turn_top()
+		    //描述:  贪吃蛇转向上
+		    //======================================================
+		    function turn_top2(){
+		    	if(bottom2!=null)
+		    	{
+		    		return;
+		    	}
+		    	if(jd2)
+		    	{
+		    		return;
+		    	}
+
+		    	if(top2==null)
+		    	{
+		    		jd2 = 1;
+		    	clearInterval(left2)
+		    	left2 = null;
+		    	clearInterval(right2) 
+		    	right2 = null;
+		    	top2 = setInterval(function top(){
+		    		if(len2<sta2)
+		    		{
+		    			s_hei2--;
+		    			show_init_head2()
+		    		}
+		    	    else{
+		    	    	s_hei2--;
+                        uneat_ege2()
+		    	    	if(judge_crash2())   //判断碰撞==================
+		    	    	{
+		    	    		return;
+		    	    	}
+		    	    	show_new_head2()
+		    	    	eat_ege2()
+		    	    }
+		    	    jd2 =0;
+		    	},speed);
+		    	}
+		    }
+            //===========================================================
+		    //名字：turn_left()
+		    //描述: 贪吃蛇转向左
+		    //==========================================================
+		     function turn_left2(){
+		     	if(right2!=null)
+		    	{
+		    		return;
+		    	}	   
+		    	if(jd2)
+		    	{
+		    		return;
+		    	}
+		    	if(left2==null)
+		    	{
+		    	jd2 = 1;
+		        clearInterval(top2)
+		    	top2 = null;
+		    	clearInterval(bottom2)
+		    	bottom2 = null;
+		    	left2 = setInterval(function top(){
+		    		if(len2<sta2)
+		    		{
+		    			s_wid2--;
+		    			show_init_head2()
+		    		}
+		    	    else{
+		    	    	s_wid2--;
+		    	    	uneat_ege2()
+		    	    	if(judge_crash2())   //判断碰撞==================
+		    	    	{
+		    	    		return;
+		    	    	}
+		    	    	show_new_head2()
+		    	    	eat_ege2();
+		    	    }
+		    	    jd2 =0;
+		    	},speed);
+		        }
+		    }
+           //===========================================================
+		    //名字：turn_right()
+		    //描述:  贪吃蛇转向右
+		    //======================================================
+		     function turn_right2(){
+		     	if(left2!=null)
+		    	{
+		    		return;
+		    	}	  
+		    	if(jd2)
+		    	{
+		    		return;
+		    	}
+
+    	    	if(right2==null)
+		    	{
+		    		jd2 = 1;
+		    	clearInterval(top2)
+		    	top2 = null;
+		    	clearInterval(bottom2)
+		    	bottom2 = null;
+		    	right2 = setInterval(function top(){
+		    		if(len2<sta2)
+		    		{
+		    			s_wid2++;
+		    			show_init_head2()
+		    		}
+		    	    else{
+		    	    	s_wid2++;
+                        uneat_ege2()
+		    	    	if(judge_crash2())   //判断碰撞==================
+		    	    	{
+		    	    		return;
+		    	    	}
+		    	    	show_new_head2()
+		    	    	eat_ege2();
+		    	    }
+		    	    jd2 =0;
+		    	},speed);
+		    	}
+
+		    }
+            //===========================================================
+		    //名字：turn_bottom()
+		    //描述: 贪吃蛇转向下
+		    //======================================================
+		     function turn_bottom2(){
+		     	if(top2!=null)
+		    	{
+		    		return;
+		    	}	    	
+		    	if(jd2)
+		    	{
+		    		return;
+		    	}
+		    	if(bottom2==null)
+		    	{
+		    		jd2 = 1;
+		    	clearInterval(left2);
+		    	left2 = null;
+		    	clearInterval(right2);
+		    	right2 = null;
+			    	bottom2 = setInterval(function bottom(){
+			    		if(len2<sta2)
+			    		{
+			    			s_hei2++;
+			    			show_init_head2()
+			    		}
+			    	    else{
+			    	    	s_hei2++;
+                            uneat_ege2()
+			    	    	if(judge_crash2())   //判断碰撞==================
+			    	    	{
+			    	    		return;
+			    	    	}
+			    	    	show_new_head2()
+			    	    	eat_ege2();
+			    	    }
+			    	    jd2 =0;
+			    	},speed);
+		       }
+		    }
+		    start_game()
+		//====================================================================================
+		//
+		//   外加人机自走模式
+		//  
+		//   时间12-06
+		//	
+		//   至12-13
+		//   12-13 目前最高129节
+		//=========================================================================================
+             //====================================================================================
+             //名字；smart_snake()
+             //描述：自动寻路前进eat ege
+             //====================================================================================
+                function smart_snake()
+             {
+             	             	//==============================================================
+             	 smart = setInterval(function smart(){
+                    smart2++;
+//           		if(Math.abs(s_hei-hei)>=Math.abs(s_wid-wid))
+//           		{   
+	              var smart_left=0,smart_right=0,smart_top=0,smart_bottom=0;
+	              var len_left=0,len_right=0,len_bottom=0,len_top=0;
+             	  for(var i = s_hei+1;i<s_hei+20;i++)
+             	  	    {
+             	  	    	if(((s_hei+20)<40)&&(table_map[i][s_wid]))
+             	  	    	{
+             	  	    		smart_bottom = 1;
+             	  	    		break
+             	  	    	}
+             	  	    	len_bottom++;
+             	  	    }
+                  for(var i = s_hei-1;i>=s_hei-20;i--)
+             	  	    {
+             	  	    	if(((s_hei-20)>=0)&&(table_map[i][s_wid]))
+             	  	    	{
+             	  	    		smart_top = 1;
+             	  	    		break;
+             	  	    	}
+             	  	    	len_top++; 
+             	  	    }
+             	  for(var i= s_wid-1;i>=s_wid-20;i--)
+             	  {
+             	  	if(((s_wid-20)>=0)&&(table_map[s_hei][i]))
+             	  	{
+             	  		smart_left = 1
+             	  		break;
+             	  	}
+             	  	len_left++;
+             	  }
+             	  for(var i=s_wid+1;i<s_wid+20;i++)
+             	  {
+             	  	if((s_wid+20<64)&&(table_map[s_hei][i]))
+             	  	{
+             	  		smart_right = 1;
+             	  		break;
+             	  	}
+             	  	len_right++;
+             	  }
+	                if(smart2==20)
+	                {
+	                	smart2=0;
+	                }
+	                //=========================================================
+	                //描述：优先竖直走再横直走
+	                //========================================================
+	                if(smart2>10)
+	                {
+	                	if(hei>s_hei)
+	             		{
+	             			if(((top1==null)&&(table_map[s_hei+1][s_wid]==0))&&(!smart_bottom))
+	             			{
+	             				turn_bottom()
+	             			}	        
+	             			else if(bottom1!=null){
+	             					if(((table_map[s_hei][s_wid-1]==0)&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei+1][s_wid-1]==0)))&&(!smart_left))
+	             					{
+	             						turn_left()
+	             					}
+	             					else if(((table_map[s_hei][s_wid+1]==0)&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei+1][s_wid+1]==0)))&&(!smart_right))
+	             					{
+	             						turn_right()
+	             					}
+	             					else if(((table_map[s_hei][s_wid-1]==0)&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei+1][s_wid-1]==0)))&&(len_left>=len_right))
+	             					{
+	             						turn_left()
+	             					}
+	             					else if(((table_map[s_hei][s_wid+1]==0)&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei+1][s_wid+1]==0))))
+	             					{
+	             						turn_right()
+	             					}
+	             		   	}
+	             			smart_eye()
+	             			return;
+	             		}
+	             		if(hei==s_hei)
+	             		{
+	             			if(wid<=s_wid)
+	             			{
+	             				if(((right1==null)&&(table_map[s_hei][s_wid-1]==0))&&(!smart_left))
+	             				{
+     	             				turn_left()
+	             				}
+             			     	else{
+	             					if(((table_map[s_hei-1][s_wid]==0)&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei-1][s_wid-1]==0)))&&(!smart_top))
+	             					{
+	             						turn_top()
+	             					}
+	             					else if(((table_map[s_hei+1][s_wid]==0)&&((table_map[s_hei+1][s_wid+1]==0)||(table_map[s_hei+1][s_wid-1]==0)))&&(!smart_bottom))
+	             					{
+	             						turn_bottom()
+	             					}
+	             					else if((((table_map[s_hei-1][s_wid]==0)&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei-1][s_wid-1]==0))))&&(len_top>=len_bottom))
+	             					{
+	             						turn_top()
+	             					}
+	             					else if(((table_map[s_hei+1][s_wid]==0)&&((table_map[s_hei+1][s_wid+1]==0)||(table_map[s_hei+1][s_wid-1]==0))))
+	             					{
+	             						turn_bottom()
+	             					}
+             				}
+	             			}
+	             			else if(wid>s_wid)
+	             			{
+	             				if(((left1==null)&&(table_map[s_hei][s_wid+1]==0))&&(!smart_right))
+	             				{
+	             					turn_right()
+	             				}  			
+	             				else{
+	             					if(((table_map[s_hei-1][s_wid]==0)&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei-1][s_wid+1]==0)))&&(!smart_top))
+	             					{
+	             						turn_top()
+	             					}
+	             					else if(((table_map[s_hei+1][s_wid]==0)&&((table_map[s_hei+1][s_wid+1]==0)||(table_map[s_hei+1][s_wid-1]==0)))&&(!smart_bottom))
+	             					{
+	             						turn_bottom()
+	             					}
+	             					else if((((table_map[s_hei-1][s_wid]==0)&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei-1][s_wid+1]==0))))&&(len_top>=len_bottom))
+	             					{
+	             						turn_top()
+	             					}
+	             					else if(((table_map[s_hei+1][s_wid]==0)&&((table_map[s_hei+1][s_wid+1]==0)||(table_map[s_hei+1][s_wid-1]==0))))
+	             					{
+	             						turn_bottom()
+	             					}
+	             				}
+	             			
+	             			smart_eye()
+	             			return;
+	             		 }
+	             		}
+	             		if(hei<s_hei)
+	             		{
+	             			if((bottom1==null))
+	             			{
+	             				if((((table_map[s_hei-1][s_wid]==0)&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei-1][s_wid+1]==0))))&&(!smart_top))
+	             				{
+	             					turn_top()
+	             				}	
+			             	else if((wid<=s_wid)&&(top1!=null))
+			             			{
+			             				if((((right1==null)&&(table_map[s_hei][s_wid-1]==0))&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei+1][s_wid-1]==0)))&&(!smart_left))
+			             				{
+		     	             				turn_left()
+			             				}
+			             			}
+			             	else if(wid>s_wid)
+			             			{
+			             				if((((left1==null)&&(table_map[s_hei][s_wid+1]==0))&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei+1][s_wid+1]==0)))&&(!smart_left))
+			             				{
+			             					turn_right()
+			             				}  			
+			             			}
+			             	else if((wid<=s_wid)&&(top1!=null))
+			             			{
+			             				if(((((right1==null)&&(table_map[s_hei][s_wid-1]==0))&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei+1][s_wid-1]==0))))&&(len_left>=len_right))
+			             				{
+		     	             				turn_left()
+			             				}
+			             			}
+			             	else if(wid>s_wid)
+			             			{
+			             				if((((left1==null)&&(table_map[s_hei][s_wid+1]==0))&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei+1][s_wid+1]==0))))
+			             				{
+			             					turn_right()
+			             				}  			
+			             			}
+	             				
+	             			}	        
+	             			smart_eye()
+                            return;
+	             		}
+	                }
+	                //=========================================================
+	                //描述：优先横走再竖直走
+	                //========================================================
+	                else{
+	                	if(wid>s_wid)
+	             		{
+	             			if(((left1==null)&&(table_map[s_hei][s_wid+1]==0))&&(!smart_right))
+	             			{
+	             				turn_right()
+	             			}	        
+	             			else if(right1!=null){
+	             					if(((table_map[s_hei+1][s_wid]==0)&&((table_map[s_hei+1][s_wid+1]==0)||(table_map[s_hei+1][s_wid-1]==0)))&&(!smart_bottom))
+	             					{
+	             						turn_bottom()
+	             					}
+	             					else if(((table_map[s_hei-1][s_wid]==0)&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei-1][s_wid-1]==0)))&&(!smart_top))
+	             					{
+	             						turn_top()
+	             					}
+	             					else if((((table_map[s_hei+1][s_wid]==0)&&((table_map[s_hei+1][s_wid+1]==0)||(table_map[s_hei+1][s_wid-1]==0))))&&(len_bottom>=len_top))
+	             					{
+	             						turn_bottom()
+	             					}
+	             					else if(((table_map[s_hei-1][s_wid]==0)&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei-1][s_wid-1]==0))))
+	             					{
+	             						turn_top()
+	             					}
+	             		   	}
+	             			smart_eye()
+	             			return;
+	             		}
+	             		if(wid==s_wid)
+	             		{
+	             			if(hei<=s_hei)
+	             			{
+	             				if(((bottom1==null)&&(table_map[s_hei-1][s_wid]==0))&&(!smart_top))
+	             				{
+     	             				turn_top()
+	             				}
+             			     	else{
+	             					if((table_map[s_hei][s_wid-1]==0)&&(!smart_left))
+	             					{
+	             						turn_left()
+	             					}
+	             					else if((table_map[s_hei][s_wid+1]==0)&&(!smart_right))
+	             					{
+	             						turn_right()
+	             					}
+	             					else if(((table_map[s_hei][s_wid-1]==0))&&(len_left>=len_right))
+	             					{
+	             						turn_left()
+	             					}
+	             					else if(table_map[s_hei][s_wid+1]==0)
+	             					{
+	             						turn_right()
+	             					}
+             				 }
+	             			}
+	             			else if(hei>s_hei)
+	             			{
+	             				if(((top1==null)&&(table_map[s_hei+1][s_wid]==0))&&(!smart_bottom))
+	             				{
+	             					turn_bottom()
+	             				}  			
+	             				else{
+	             					if(((table_map[s_hei][s_wid+1]==0))&&(!smart_right))
+	             					{
+	             						turn_right()
+	             					}
+	             					else if(((table_map[s_hei][s_wid-1]==0))&&(!smart_left))
+	             					{
+	             						turn_left()
+	             					}
+	             					else if(((table_map[s_hei][s_wid+1]==0))&&(len_right>=len_left))
+	             					{
+	             						turn_right()
+	             					}
+	             					else if((table_map[s_hei][s_wid-1]==0))
+	             					{
+	             						turn_left()
+	             					}
+	             				}
+	             	     	}
+	             			smart_eye()
+	             			return;
+	             		}
+	             		if(wid<s_wid)
+	             		{
+	             			if((right1==null))
+	             			{
+	             				if(((table_map[s_hei][s_wid-1]==0))&&(!smart_left))
+	             				{
+	             					turn_left()
+	             				}	
+			             	   else if((hei<=s_hei)&&(top1!=null))
+			             			{
+			             				if((((top1==null)&&(table_map[s_hei+1][s_wid]==0))&&((table_map[s_hei+1][s_wid11]==0)||(table_map[s_hei+1][s_wid+1]==0)))&&(!smart_bottom))
+			             				{
+		     	             				turn_bottom()
+			             				}
+			             			}
+			                	else if(hei>s_hei)
+			             			{
+			             				if((((bottom1==null)&&(table_map[s_hei-1][s_wid]==0))&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei-1][s_wid-1]==0)))&&(!smart_top))
+			             				{
+			             					turn_top()
+			             				}  			
+			             			}
+			             	   else if((hei<=s_hei)&&(top1!=null))
+			             			{
+			             				if(((((top1==null)&&(table_map[s_hei+1][s_wid]==0))&&((table_map[s_hei+1][s_wid11]==0)||(table_map[s_hei+1][s_wid+1]==0))))&&(len_bottom>=len_top))
+			             				{
+		     	             				turn_bottom()
+			             				}
+			             			}
+			                	else if(hei>s_hei)
+			             			{
+			             				if((((bottom1==null)&&(table_map[s_hei-1][s_wid]==0))&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei-1][s_wid-1]==0))))
+			             				{
+			             					turn_top()
+			             				}  			
+			             			}
+	             				
+	             			}	        
+	             			smart_eye()
+                            return;
+	                }
+                  }
+             	},speed)
+             }
+              //====================================================================================
+             //名字；smart_eye()
+             //描述：自动规避
+             //====================================================================================
+             function smart_eye(){
+             	var smart_left=0,smart_right=0,smart_top=0,smart_bottom=0;
+             	  for(var i = s_hei+1;i<40;i++)
+             	  	    {
+             	  	    	if(table_map[i][s_wid])
+             	  	    	{
+             	  	    		smart_bottom = 1;
+             	  	    	}
+             	  	    }
+                  for(var i = s_hei-1;i>=0;i--)
+             	  	    {
+             	  	    	if(table_map[i][s_wid])
+             	  	    	{
+             	  	    		smart_top = 1;
+             	  	    	}
+             	  	    }
+             	  for(var i= s_wid-1;i>=0;i--)
+             	  {
+             	  	if(table_map[s_hei][i])
+             	  	{
+             	  		smart_left = 1
+             	  	}
+             	  }
+             	  for(var i=s_wid+1;i<64;i++)
+             	  {
+             	  	if(table_map[s_hei][i])
+             	  	{
+             	  		smart_right = 1;
+             	  	}
+             	  }
+             	  if(left1!=null)
+             	  {
+             	  	 if((s_wid-1<0))
+             	  	 {
+             	  	 	if((table_map[s_hei-1][s_wid]==0)&&(s_hei-1>=0))
+         					{
+         						turn_top()
+         					}
+         				else 
+         					{
+         						turn_bottom()
+         					}
+             	  	 	return 1;
+             	  	 }
+             	  }
+             	  if(right1!=null)
+             	  {
+             	  	if((s_wid+1>=64))
+             	  	{
+             	  		if((table_map[s_hei+1][s_wid]==0)&&(s_hei+1<40))
+         					{
+         						turn_bottom()
+         					}
+         					else
+         					{
+         						turn_top()
+         					}
+             	  		return 1;
+             	  	}
+             	  }
+             	  if(top1!=null)
+             	  {
+             	  	if((s_hei-1<0))
+             	  	{
+     					if((table_map[s_hei][s_wid-1]==0)&&(s_wid-1>=0))
+     					{
+     						turn_left()
+     					}
+     					else
+     					{
+     						turn_right()
+     					}
+             	  		return 1;
+             	  	}
+             	  }
+             	  if( bottom1!=null)
+             	  {
+             	  	if(s_hei+1>=40)
+             	  	{
+     					if((table_map[s_hei][s_wid+1]==0)&&(s_wid+1<64))
+     					{
+     						turn_right()
+     					}
+     					else 
+     					{
+     						turn_left()
+     					}
+             	  		return 1;
+             	  	}
+             	  }
+             	  //================================================================
+             	  if(left1!=null)
+             	  {
+             	  	  
+             	  	 	if((((table_map[s_hei][s_wid-1]==1)&&(table_map[s_hei-1][s_wid]==0))&&((table_map[s_hei-1][s_wid-1]==0)&&(table_map[s_hei-1][s_wid+1]==0))))
+         					{
+         						turn_top()
+         					}
+         				else if(((table_map[s_hei][s_wid-1]==1)&&(table_map[s_hei+1][s_wid]==0))&&((table_map[s_hei+1][s_wid-1]==0)&&(table_map[s_hei+1][s_wid+1]==0)))
+         					{
+         						turn_bottom()
+         					}
+             	  	 	else if((((table_map[s_hei][s_wid-1]==1)&&(table_map[s_hei-1][s_wid]==0))&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei-1][s_wid+1]==0)))&&((s_hei>=map_hei[0])&&(!smart_top)))
+         					{
+         						turn_top()
+         					}
+         				else if((((table_map[s_hei][s_wid-1]==1)&&(table_map[s_hei+1][s_wid]==0))&&((table_map[s_hei+1][s_wid-1]==0)||(table_map[s_hei+1][s_wid+1]==0)))&&((s_hei<=map_hei[0])&&(!smart_bottom)))
+         					{
+         						turn_bottom()
+         					}
+         				else if(((table_map[s_hei][s_wid-1]==1)&&(table_map[s_hei-1][s_wid]==0))&&(s_hei>=map_hei[0])){
+         					turn_top()
+         				}
+         				else if(((table_map[s_hei][s_wid-1]==1)&&(table_map[s_hei+1][s_wid]==0))&&(s_hei<=map_hei[0])){
+         					turn_bottom()
+         				}
+         				else if((table_map[s_hei][s_wid-1]==1)&&(table_map[s_hei-1][s_wid]==0)){
+         					turn_top()
+         				}
+         				else if((table_map[s_hei][s_wid-1]==1)&&(table_map[s_hei+1][s_wid]==0)){
+         					turn_bottom()
+         				}
+             	  	 	return 1;
+             	   }
+             	  
+             	  if(right1!=null)
+             	  {
+             	  	   if((((table_map[s_hei][s_wid+1]==1)&&(table_map[s_hei-1][s_wid]==0))&&((table_map[s_hei-1][s_wid-1]==0)&&(table_map[s_hei-1][s_wid+1]==0))))
+         					{
+         						turn_top()
+         					}
+         				else if(((table_map[s_hei][s_wid+1]==1)&&(table_map[s_hei+1][s_wid]==0))&&((table_map[s_hei+1][s_wid-1]==0)&&(table_map[s_hei+1][s_wid+1]==0)))
+         					{
+         						turn_bottom()
+         					}
+             	  	   else if((((table_map[s_hei][s_wid+1]==1)&&(table_map[s_hei-1][s_wid]==0))&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei-1][s_wid+1]==0)))&&((s_hei>=map_hei[0])&&(!smart_top)))
+         					{
+         						turn_top()
+         					}
+         				else if((((table_map[s_hei][s_wid+1]==1)&&(table_map[s_hei+1][s_wid]==0))&&((table_map[s_hei+1][s_wid-1]==0)||(table_map[s_hei+1][s_wid+1]==0)))&&((s_hei<=map_hei[0])&&(!smart_bottom)))
+         					{
+         						turn_bottom()
+         					}
+         				else if(((table_map[s_hei][s_wid+1]==1)&&(table_map[s_hei-1][s_wid]==0))&&(s_hei>=map_hei[0])){
+         					turn_top()
+         				}
+         				else if(((table_map[s_hei][s_wid+1]==1)&&(table_map[s_hei+1][s_wid]==0))&&(s_hei<=map_hei[0])){
+         					turn_bottom()
+         				}
+         				else if((table_map[s_hei][s_wid+1]==1)&&(table_map[s_hei-1][s_wid]==0)){
+         					turn_top()
+         				}
+         				else if((table_map[s_hei][s_wid+1]==1)&&(table_map[s_hei+1][s_wid]==0)){
+         					turn_bottom()
+         				}
+             	  	 	return 1;
+             	  }
+             	  if(top1!=null)
+             	  {
+     					   if((((table_map[s_hei-1][s_wid]==1)&&(table_map[s_hei][s_wid-1]==0))&&((table_map[s_hei-1][s_wid-1]==0)&&(table_map[s_hei+1][s_wid-1]==0))))
+         					{
+         						turn_left()
+         					}
+         				    else if(((table_map[s_hei-1][s_wid]==1)&&(table_map[s_hei][s_wid+1]==0))&&((table_map[s_hei-1][s_wid+1]==0)&&(table_map[s_hei+1][s_wid+1]==0)))
+         					{
+         						turn_right()
+         					}
+     					   else if((((table_map[s_hei-1][s_wid]==1)&&(table_map[s_hei][s_wid-1]==0))&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei+1][s_wid-1]==0)))&&((s_wid>=map_wid[0])&&(!smart_left)))
+         					{
+         						turn_left()
+         					}
+         				    else if((((table_map[s_hei-1][s_wid]==1)&&(table_map[s_hei][s_wid+1]==0))&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei+1][s_wid+1]==0)))&&((s_wid<=map_wid[0])&&(!smart_right)))
+         					{
+         						turn_right()
+         					}
+         				else if(((table_map[s_hei-1][s_wid]==1)&&(table_map[s_hei][s_wid-1]==0))&&(s_wid>=map_wid[0])){
+         					turn_left()
+         				}
+         				else if(((table_map[s_hei-1][s_wid]==1)&&(table_map[s_hei][s_wid+1]==0))&&(s_wid<=map_wid[0])){
+         					turn_right()
+         				}
+         				else if(((table_map[s_hei-1][s_wid]==1)&&(table_map[s_hei][s_wid-1]==0)))
+         				{
+         					turn_left()
+         				}
+         				else if(((table_map[s_hei-1][s_wid]==1)&&(table_map[s_hei][s_wid+1]==0)))
+         				{
+         					turn_right()
+         				}
+             	  	 	return 1;
+             	  	
+             	  }
+             	  if( bottom1!=null)
+             	  {
+             	  	       if((((table_map[s_hei+1][s_wid]==1)&&(table_map[s_hei][s_wid-1]==0))&&((table_map[s_hei-1][s_wid-1]==0)&&(table_map[s_hei+1][s_wid-1]==0))))
+         					{
+         						turn_left()
+         					}
+         				    else if(((table_map[s_hei+1][s_wid]==1)&&(table_map[s_hei][s_wid+1]==0))&&((table_map[s_hei-1][s_wid+1]==0)&&(table_map[s_hei+1][s_wid+1]==0)))
+         					{
+         						turn_right()
+         					}
+             	  	       else if((((table_map[s_hei+1][s_wid]==1)&&(table_map[s_hei][s_wid-1]==0))&&((table_map[s_hei-1][s_wid-1]==0)||(table_map[s_hei+1][s_wid-1]==0)))&&((s_wid>=map_wid[0])&&(!smart_left)))
+         					{
+         						turn_left()
+         					}
+         				    else if((((table_map[s_hei+1][s_wid]==1)&&(table_map[s_hei][s_wid+1]==0))&&((table_map[s_hei-1][s_wid+1]==0)||(table_map[s_hei+1][s_wid+1]==0)))&&((s_wid<=map_wid[0])&&(!smart_right)))
+         					{
+         						turn_right()
+         					}
+         				else if(((table_map[s_hei+1][s_wid]==1)&&(table_map[s_hei][s_wid-1]==0))&&(s_wid>=map_wid[0])){
+         					turn_left()
+         				}
+         				else if(((table_map[s_hei+1][s_wid]==1)&&(table_map[s_hei][s_wid+1]==0))&&(s_wid<=map_wid[0])){
+         					turn_right()
+         				}
+         				else if(((table_map[s_hei+1][s_wid]==1)&&(table_map[s_hei][s_wid-1]==0)))
+         				{
+         					turn_left()
+         				}
+         				else if(((table_map[s_hei+1][s_wid]==1)&&(table_map[s_hei][s_wid+1]==0)))
+         				{
+         					turn_right()
+         				}
+             	  	 	return 1;
+             	  }
+             }
+
+        //     smart_snake()
+		</script>
+	</body>
+</html>
+

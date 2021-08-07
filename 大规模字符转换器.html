@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	  <style>
+	  *{
+	  	 color: brown;
+	  }
+	  	 #text{
+	  	    background: bisque;
+	  	 }
+	  	 #d1{
+	  	 		  	 	width: 400px;
+	  	 }
+	    #d1 input{
+	    	height: 40px;
+	    	width: 300px;
+	    	 background: bisque;
+	    }
+	    #d1 button{
+	    	height: 80px;
+	        float: right;
+	        margin-top: -40px;
+	        margin-right: 20px;
+	        background: gainsboro;
+	    }
+	    #body1{
+	    	width: 440px;
+	    	background: red;
+	    	border: double 5px black;
+	    	padding-left: 30px;
+	    	margin-left: 280px;
+	    }
+	  </style>
+	<body>
+		<div id="body1"><textarea id="text" style="height: 400px; width: 400px;"></textarea>
+	    <div id="d1">
+	    <input type="text" id="t1" placeholder="输入要替换的字符串"/>
+	    <input type="text" id="t2" placeholder="输入代替原来的新的字符串" />
+	    <button onclick="change1()">替换</button></div></div>
+	    
+	    
+	      <script type="text/javascript">
+	      function change1(){
+	      	var t1=document.getElementById("t1").value
+	      	var t2=document.getElementById("t2").value
+	      	 var tex = document.getElementById("text").value
+	      	 new RegExp(t1, "g");
+	      	th = tex.replace(new RegExp(t1, "g"),t2)
+	      	 document.getElementById("text").value = th
+	      	 document.getElementById("t1").value =""
+	      	 document.getElementById("t2").value =""
+	      }      	 
+	      </script>
+	</body>
+</html>
